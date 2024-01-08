@@ -1,0 +1,22 @@
+.feed_wrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    margin-top: 100px;
+}
+.profile{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+.profile_logo{
+    border-radius: 50%;
+    border: 2px solid silver;
+    width: 120px;
+    height: 120px;
+}
