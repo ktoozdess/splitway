@@ -19,14 +19,10 @@ const Creategroup = () =>{
             const docRef = await addDoc(collection(db, "groups"), {
                 name: Groupname,
                 admin: user.uid,
-                members: [ {
-                    userlent:{},
-                    userowes:{},
-                    'user': user.email
-                    }
-                ],
+                members: [user.email],
                 expenses: [],
                 currency: Switchcurrency,
+
             });
                 navigate('../homepage', { replace: true })
             } catch (e) {

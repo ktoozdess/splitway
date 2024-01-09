@@ -21,21 +21,25 @@ const Group = () => {
     const [ussers, setUssers] = useState([])
     const [members, setMembers] = useState([])
     const [expenses, setExpenses] = useState([])
+    const [expense, setExpense] = useState([])
     const [NewMember, SetNewMember] = useState('')
     const [expensetitle, Setexpensetitle] = useState('')
     const [expenseamount, Setexpenseamount] = useState()
     const [expensesplitby, Setexpensesplitby] = useState('equally')
-    const [countryList, setCountries] = useState([]);
+    const [Userswo, SetUserswo] = useState([]);
 
-    const [MyMember, SetMyMember] = useState([])
     useEffect(() =>{
         let libusers = []
+        let libuserswo = []
+        let libexpense = []
+
         const FetchUser = async() =>{
             const querySnapshot = await getDocs(collection(db, "users"));
             querySnapshot.forEach((doc) => {
               libusers.push(doc.data())
             });
             setUssers(libusers)
+
           }
 
         const FetchData = async() =>{
@@ -53,38 +57,35 @@ const Group = () => {
                 setData(data)
                 setMembers(data.members)
                 setExpenses(data.expenses)
+                Object.values(data.expenses).map((expense) =>{
+                    Object.values(expense.userowes).map((expens) =>{
+                        libexpense.push(expens)
+                    })
+                    setExpense(libexpense)
+                })
               }
-              Object.values(members).map(async(member) =>{
-                if(auth.currentUser.email == member.user){
-                    SetMyMember(member)
-
-                }
+              Object.values(members).map((member) =>{
+                if(member !== auth.currentUser.email){
+                    libuserswo.push(member)
+                  }
             })
+            SetUserswo(libuserswo)
+            console.log(expenses);
 
           });
         }
         FetchUser()
         FetchData()
         totalamount()
+
     }, [NewMember, expensetitle])
 
-const pushsh = () =>{
-    const user =  {'user': 'testeuser'}
-    setDoc(doc(db, "groups", id), { expenses: arrayUnion({userlent: user, userowes: 'hhhh', 'user': 'tigerfpvteam@gmail.com'}) } , { merge: true });
-}
-console.log(MyMember);
 
     const UpdateData = async() =>{
         const result = ussers.filter((user) => user.email == NewMember);
         if(result.length == 1){
             await updateDoc(doc(db, "groups", id), {
-                members: arrayUnion(
-                    {
-                        userlent:{},
-                        userowes:{},
-                        'user': NewMember
-                        }
-                )
+                members: arrayUnion(NewMember)
             })
             .then(() =>{
                 SetNewMember('')
@@ -94,8 +95,8 @@ console.log(MyMember);
             document.querySelector('.add_member_block').classList.add('hidden')
             alert('User not found')
         }
-
     }
+
     const event = new Date();
     const options = {
       weekday: 'short',
@@ -105,49 +106,25 @@ console.log(MyMember);
     };
     const timestamp = event.toLocaleDateString('en-EN', options)
 
-var sum = 0;
-const totalamount = () =>{
-    expenses.forEach(function(expense) {
-        sum += parseInt(expense.expenseamount);
-    });
-    return sum
-}
-
+    var sum = 0;
+    const totalamount = () =>{
+        expenses.forEach(function(expense) {
+            sum += parseInt(expense.expenseamount);
+        });
+        return sum
+    }
     const UpdateDataExpense = async() =>{
         const expenseuser = auth.currentUser.email
-        if(expensetitle !== '' && expenseamount !== 0){
+        if(expensetitle !== '' && expenseamount !== 0 && expensesplitby == 'equally'){
+            let userowe = []
+            Object.values(Userswo).map(async(Userswoo) =>{
+                userowe.push({'email' : Userswoo, 'amount' : '200'})
+            })
+
             await updateDoc(doc(db, "groups", id), {
-                expenses: arrayUnion({expensetitle, expenseamount, timestamp, userlent: {}, userowes: {}, expenseuser, splitby: 'equally'})
+                expenses: arrayUnion({expensetitle, expenseamount, timestamp, userlent: {}, userowes: userowe, expenseuser, splitby: 'equally'})
             })
             .then(() =>{
-                // setDoc(doc(db, "groups", id), { expenses: arrayUnion({userlent: user, userowes: 'hhhh', 'user': 'tigerfpvteam@gmail.com'}) } , { merge: true });
-
-
-            //     if (expensesplitby == 'equally'){
-            //         Object.values(members).map(async(member) =>{
-            //             if(member.user == expenseuser){
-            //                 console.log(expenseuser)
-            //                 await updateDoc(doc(db, "groups", id), {
-            //                     members: [ {
-            //                         userlent:{'ewassd21e': '2131'},
-            //                         userowes:{},
-            //                         'user': expenseuser
-            //                         }
-            //                     ]
-            //                 })
-            //             }
-
-            //     })
-            // }
-                    // await updateDoc(doc(db, "groups", id), {
-                    //     members: [ {
-                    //         userlent:{},
-                    //         userowes:{},
-                    //         'user': user.email
-                    //         }
-                    //     ]
-                    // })
-
                 Setexpensetitle('')
                 Setexpenseamount(0)
                 document.querySelector('.add_expense_block').classList.add('hidden')
@@ -177,6 +154,7 @@ const totalamount = () =>{
     const closewindowhandleopt = () =>{
         document.querySelector('.options_block').classList.add('hidden')
     }
+
     return(
         <div>
             <HeaderHome />
@@ -235,17 +213,26 @@ const totalamount = () =>{
                     {
                         Object.values(members).map((member, index) =>(
                             <ul key={index} class="flex flex-col items-start content-start list-disc">
-                            <li>{member.user}</li>
+                            <li>{member}</li>
                         </ul>
                         ))
                     }
-                    {/* {
-                        Object.values(members).map((member, index) =>(
-                            console.log(member)
-                        ))
-                    } */}
                     <a className={styles.btn_submit} onClick={addmember} >Add member</a>
-                    <a className={styles.btn_submit} onClick={pushsh} >push</a>
+
+                    <h3>Users who owe me</h3>
+                    {
+                        Object.values(expense).map((exp, index) =>(
+                            <ul key={index} class="flex flex-col items-start content-start list-disc">
+                            <li>{exp.email}</li>
+                        </ul>
+                        ))
+                        //  expense.map((exp, index) =>(
+                        //     <div className={styles.expense} key={index}>
+                        //         <p>{exp.email}</p>
+
+                        //     </div>
+                        //     ))
+                        }
                 </div>
                 <div className={styles.right_bar}>
                     <div className={styles.info_opt_etc}>
