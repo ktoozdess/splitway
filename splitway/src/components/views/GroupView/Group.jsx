@@ -9,8 +9,7 @@ import HeaderHome from '../../headerhome/HeaderHome';
 import settings from '../../../assets/settings.svg'
 import close from '../../../assets/close.svg'
 import { getAuth } from 'firebase/auth';
-
-
+import Expenses from './components/Expenses.jsx';
 
 
 const Group = () => {
@@ -57,12 +56,13 @@ const Group = () => {
                 setData(data)
                 setMembers(data.members)
                 setExpenses(data.expenses)
-                Object.values(data.expenses).map((expense) =>{
-                    Object.values(expense.userowes).map((expens) =>{
-                        libexpense.push(expens)
-                    })
-                    setExpense(libexpense)
-                })
+                // Object.values(data.expenses).map((expense) =>{
+                //     Object.values(expense.userowes).map((expens) =>{
+                //         libexpense.push(expens)
+                //     })
+                //     setExpense(libexpense)
+
+                // })
               }
               Object.values(members).map((member) =>{
                 if(member !== auth.currentUser.email){
@@ -70,8 +70,6 @@ const Group = () => {
                   }
             })
             SetUserswo(libuserswo)
-            console.log(expenses);
-
           });
         }
         FetchUser()
@@ -106,19 +104,20 @@ const Group = () => {
     };
     const timestamp = event.toLocaleDateString('en-EN', options)
 
-    var sum = 0;
-    const totalamount = () =>{
-        expenses.forEach(function(expense) {
-            sum += parseInt(expense.expenseamount);
-        });
-        return sum
-    }
+var sum = 0;
+const totalamount = () =>{
+    expenses.forEach(function(expense) {
+        sum += parseInt(expense.expenseamount);
+    });
+    return sum
+}
     const UpdateDataExpense = async() =>{
         const expenseuser = auth.currentUser.email
+        const expamountsbequall = expenseamount / members.length
         if(expensetitle !== '' && expenseamount !== 0 && expensesplitby == 'equally'){
             let userowe = []
             Object.values(Userswo).map(async(Userswoo) =>{
-                userowe.push({'email' : Userswoo, 'amount' : '200'})
+                userowe.push({'email' : Userswoo, 'amount' : expamountsbequall})
             })
 
             await updateDoc(doc(db, "groups", id), {
@@ -154,7 +153,6 @@ const Group = () => {
     const closewindowhandleopt = () =>{
         document.querySelector('.options_block').classList.add('hidden')
     }
-
     return(
         <div>
             <HeaderHome />
@@ -220,19 +218,7 @@ const Group = () => {
                     <a className={styles.btn_submit} onClick={addmember} >Add member</a>
 
                     <h3>Users who owe me</h3>
-                    {
-                        Object.values(expense).map((exp, index) =>(
-                            <ul key={index} class="flex flex-col items-start content-start list-disc">
-                            <li>{exp.email}</li>
-                        </ul>
-                        ))
-                        //  expense.map((exp, index) =>(
-                        //     <div className={styles.expense} key={index}>
-                        //         <p>{exp.email}</p>
-
-                        //     </div>
-                        //     ))
-                        }
+                        <Expenses expenses={expenses} expense={expense} data={data} />
                 </div>
                 <div className={styles.right_bar}>
                     <div className={styles.info_opt_etc}>
