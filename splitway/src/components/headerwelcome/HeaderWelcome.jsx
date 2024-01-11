@@ -12,10 +12,10 @@ const HeaderWelcome = () =>{
         </a>
 
         <div className="flex">
-          <Link to={'/signin'}>
-             Login
+          <Link class="mx-2" to={'/signin'}>
+             Log In
            </Link>
-           <Link to={'/signup'}>
+           <Link class="mx-2" to={'/signup'}>
              Sign Up
            </Link>
         </div>

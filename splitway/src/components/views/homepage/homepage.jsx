@@ -39,7 +39,7 @@ const Home = () =>{
                 admin: doc.data().admin,
                 members: doc.data().members
             }
-            const leng = (datas.members.filter((member) => member == usser.email)).length
+            const leng = (datas.members.filter((member) => member.email == usser.email)).length
             if (leng !== 0) {
               libdata.push(datas)
               setData(libdata)
@@ -55,7 +55,7 @@ const Home = () =>{
           {
             Object.values(group.members).map((member, index) =>(
               <ul key={index} class="flex flex-col items-start content-start list-disc">
-                <li>{member}</li>
+                <li>{member.email}</li>
               </ul>
             ))
           }

@@ -2,7 +2,7 @@ import styles from './Group.module.scss'
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { collection, getDocs, updateDoc, doc, query, arrayUnion, setDoc } from 'firebase/firestore'
+import { collection, getDocs, updateDoc, doc, query, arrayUnion, deleteField, setDoc, deleteDoc, arrayRemove  } from 'firebase/firestore'
 import db from "../../../service/firebase.js"
 import { Link } from "react-router-dom";
 import HeaderHome from '../../headerhome/HeaderHome';
@@ -16,6 +16,7 @@ const Group = () => {
     const navigate = useNavigate()
     const {id} = useParams()
     const auth = getAuth();
+    const user = auth.currentUser;
     const [data, setData] = useState([])
     const [ussers, setUssers] = useState([])
     const [members, setMembers] = useState([])
@@ -31,7 +32,6 @@ const Group = () => {
         let libusers = []
         let libuserswo = []
         let libexpense = []
-
         const FetchUser = async() =>{
             const querySnapshot = await getDocs(collection(db, "users"));
             querySnapshot.forEach((doc) => {
@@ -56,16 +56,9 @@ const Group = () => {
                 setData(data)
                 setMembers(data.members)
                 setExpenses(data.expenses)
-                // Object.values(data.expenses).map((expense) =>{
-                //     Object.values(expense.userowes).map((expens) =>{
-                //         libexpense.push(expens)
-                //     })
-                //     setExpense(libexpense)
-
-                // })
               }
               Object.values(members).map((member) =>{
-                if(member !== auth.currentUser.email){
+                if(member.email !== auth.currentUser.email){
                     libuserswo.push(member)
                   }
             })
@@ -81,10 +74,11 @@ const Group = () => {
 
     const UpdateData = async() =>{
         const result = ussers.filter((user) => user.email == NewMember);
+        console.log(result);
         if(result.length == 1){
-            await updateDoc(doc(db, "groups", id), {
-                members: arrayUnion(NewMember)
-            })
+            await setDoc(doc(db, "groups", id), {
+                members: arrayUnion({'email' : NewMember})
+            },{merge: true})
             .then(() =>{
                 SetNewMember('')
                 document.querySelector('.add_member_block').classList.add('hidden')
@@ -153,6 +147,37 @@ const totalamount = () =>{
     const closewindowhandleopt = () =>{
         document.querySelector('.options_block').classList.add('hidden')
     }
+
+    const LeaveGroupHandle = () =>{
+        const LeaveGroup = async() =>{
+            members.map(async(mem) =>{
+                if(mem.email == user.email){
+                    await updateDoc(doc(db, "groups", id), {
+                        members: arrayRemove({'email' : mem.email})
+                        })
+                }
+            })
+
+            navigate('../homepage', { replace: true })
+        }
+        if(user && data.admin !== user.uid){
+            return(
+                <a onClick={LeaveGroup}>Leave Group</a>
+            )
+        }
+    }
+
+    const deleteGroup = () =>{
+        const deleteGroup = async() =>{
+            await deleteDoc(doc(db, "groups", id));
+            navigate('../homepage', { replace: true })
+        }
+        if(user && data.admin == user.uid){
+            return(
+                <a class="btn btn-danger" onClick={deleteGroup}>Delete Group</a>
+            )
+        }
+    }
     return(
         <div>
             <HeaderHome />
@@ -196,8 +221,8 @@ const totalamount = () =>{
                             <p>Options</p>
                             <div class="flex flex-row flex-wrap w-12/12 items-center">
                                 <div class="flex flex-col m-2">
-                                    <p>switch</p>
-                                    <p>switch</p>
+                                    {LeaveGroupHandle()}
+                                    {deleteGroup()}
                                 </div>
                             </div>
                             <a className={styles.btn_submit}  >Save</a>
@@ -211,7 +236,7 @@ const totalamount = () =>{
                     {
                         Object.values(members).map((member, index) =>(
                             <ul key={index} class="flex flex-col items-start content-start list-disc">
-                            <li>{member}</li>
+                             {member.id == data.admin ? <li className={styles.admincolor}>{member.email}</li> : <li className={styles.standartcolor}>{member.email}</li>}
                         </ul>
                         ))
                     }

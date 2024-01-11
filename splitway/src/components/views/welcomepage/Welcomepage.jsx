@@ -41,6 +41,7 @@ const createuser = () => {
         .then(async() =>{
             try {
                 await setDoc(doc(db, "users", auth.currentUser.uid), {
+                    id: auth.currentUser.uid,
                     email: email,
                     username: username,
                     profilePhoto: 'https://i.pinimg.com/736x/c9/e3/e8/c9e3e810a8066b885ca4e882460785fa.jpg',
@@ -76,6 +77,7 @@ const signInWithGoogle = () => {
       try {
           if( Object.keys(usser.filter(user => user.id == result.user.uid)).length == 0 ){
           await setDoc(doc(db, "users", result.user.uid), {
+              id: result.user.uid,
               email: result.user.email,
               username: result.user.displayName,
               profilePhoto: 'https://i.pinimg.com/736x/c9/e3/e8/c9e3e810a8066b885ca4e882460785fa.jpg',
@@ -112,7 +114,7 @@ const signInWithGoogle = () => {
           <p>Main phrase</p>
         </div>
         <div className={styles.main_phrase_arrow}>
-          <img src={arrow_down} alt="next" />
+          <img class="animate__animated animate__heartBeat animate__slower animate__infinite" src={arrow_down} alt="next" />
         </div>
 
         <div className={styles.first_intro}>

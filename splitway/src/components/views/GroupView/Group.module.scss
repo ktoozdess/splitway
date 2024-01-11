@@ -1,6 +1,12 @@
 .bars{
     min-height: 640px;
 }
+.admincolor::marker{
+    color: #F76806;
+}
+.standartcolor::marker{
+    color:#54C3EA;
+}
 .btn_submit {
   background-color: #222;
   border-radius: 4px;

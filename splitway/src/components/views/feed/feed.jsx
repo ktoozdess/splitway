@@ -73,8 +73,8 @@ const FeedPage = () =>{
             <p>@{ usser.username }</p>
             <p>Email: {usser.email}</p>
           </div>
-          <Link to={'/updateprofile'} class="border border-black mt-4">Update profile</Link>
-          <button class="border border-black mt-4" onClick={logout}>logout</button>
+          <Link  to={'/updateprofile'} class="btn bg-[#54C3EA] mt-4">Update profile</Link>
+          <button class="btn bg-[#F76806] mt-4" onClick={logout}>logout</button>
         </div>
       </div>
 

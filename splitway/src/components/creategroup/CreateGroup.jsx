@@ -2,10 +2,11 @@ import styles from './CreateGroup.module.scss'
 import { useState } from 'react'
 import { Link } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
-import { addDoc, collection } from '@firebase/firestore';
+import { addDoc, collection, arrayUnion } from '@firebase/firestore';
 import db from "../../service/firebase.js"
 import { getAuth } from 'firebase/auth';
-import { useEffect } from 'react';
+
+import React from 'react'
 
 const Creategroup = () =>{
     const navigate = useNavigate()
@@ -19,7 +20,7 @@ const Creategroup = () =>{
             const docRef = await addDoc(collection(db, "groups"), {
                 name: Groupname,
                 admin: user.uid,
-                members: [user.email],
+                members: arrayUnion({'email' : user.email, 'id' : user.uid}),
                 expenses: [],
                 currency: Switchcurrency,
 
