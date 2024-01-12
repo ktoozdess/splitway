@@ -7,6 +7,7 @@ import db from "../../../service/firebase.js"
 import { Link } from "react-router-dom";
 import HeaderHome from '../../headerhome/HeaderHome';
 import settings from '../../../assets/settings.svg'
+import morevert from '../../../assets/morevert.svg'
 import close from '../../../assets/close.svg'
 import { getAuth } from 'firebase/auth';
 import Expenses from './components/Expenses.jsx';
@@ -26,7 +27,8 @@ const Group = () => {
     const [expensetitle, Setexpensetitle] = useState('')
     const [expenseamount, Setexpenseamount] = useState()
     const [expensesplitby, Setexpensesplitby] = useState('equally')
-    const [Userswo, SetUserswo] = useState([]);
+    const [Userswo, SetUserswo] = useState([])
+    const [GroupName, SetGroupName] = useState('')
 
     useEffect(() =>{
         let libusers = []
@@ -69,7 +71,7 @@ const Group = () => {
         FetchData()
         totalamount()
 
-    }, [NewMember, expensetitle])
+    }, [NewMember, expensetitle, GroupName, expenses])
 
 
     const UpdateData = async() =>{
@@ -111,7 +113,7 @@ const totalamount = () =>{
         if(expensetitle !== '' && expenseamount !== 0 && expensesplitby == 'equally'){
             let userowe = []
             Object.values(Userswo).map(async(Userswoo) =>{
-                userowe.push({'email' : Userswoo, 'amount' : expamountsbequall})
+                userowe.push({'email' : Userswoo.email, 'amount' : expamountsbequall})
             })
 
             await updateDoc(doc(db, "groups", id), {
@@ -162,19 +164,45 @@ const totalamount = () =>{
         }
         if(user && data.admin !== user.uid){
             return(
-                <a onClick={LeaveGroup}>Leave Group</a>
+                <a class="btn btn-danger" onClick={LeaveGroup}>Leave Group</a>
             )
         }
     }
-
+    const deleteExpense = (expense) =>{
+        expenses.map(async(exp) =>{
+            if(exp.email == expense.email){
+                await updateDoc(doc(db, "groups", id), {
+                    expenses: arrayRemove(expense)
+                    })
+            }
+        })
+    }
     const deleteGroup = () =>{
         const deleteGroup = async() =>{
             await deleteDoc(doc(db, "groups", id));
             navigate('../homepage', { replace: true })
         }
+        const updateGroupName = async() =>{
+            if(GroupName !== ''){
+                await updateDoc(doc(db, "groups", id), {
+                    name: GroupName
+                }).then(()=>{
+                    closewindowhandleopt()
+                    SetGroupName('')
+                })
+
+            }
+        }
         if(user && data.admin == user.uid){
             return(
-                <a class="btn btn-danger" onClick={deleteGroup}>Delete Group</a>
+                <div class="flex flex-col justify-center">
+                    <div  className={styles.input_group}>
+                        <input class="form-control" type="text" placeholder='Change group name'  value={GroupName} onChange={(event) => SetGroupName(event.target.value)}/>
+                        <button onClick={updateGroupName} className="btn btn-secondary">Save</button>
+                    </div>
+                    <a class="btn btn-danger" onClick={deleteGroup}>Delete Group</a>
+                </div>
+
             )
         }
     }
@@ -218,14 +246,12 @@ const totalamount = () =>{
                             <a onClick={closewindowhandleopt}><img src={close} alt="close" /></a>
                         </div>
                         <div className={styles.options_wrapper}>
-                            <p>Options</p>
                             <div class="flex flex-row flex-wrap w-12/12 items-center">
                                 <div class="flex flex-col m-2">
                                     {LeaveGroupHandle()}
                                     {deleteGroup()}
                                 </div>
                             </div>
-                            <a className={styles.btn_submit}  >Save</a>
                         </div>
                     </div>
                 </div>
@@ -242,8 +268,13 @@ const totalamount = () =>{
                     }
                     <a className={styles.btn_submit} onClick={addmember} >Add member</a>
 
-                    <h3>Users who owe me</h3>
+                    {expenses.length !== 0 &&
+                    <div>
+                        <h3>Users who owe me</h3>
                         <Expenses expenses={expenses} expense={expense} data={data} />
+                    </div>
+
+                    }
                 </div>
                 <div className={styles.right_bar}>
                     <div className={styles.info_opt_etc}>
@@ -259,6 +290,16 @@ const totalamount = () =>{
                                 <p>{expense.expensetitle}</p>
                                 <p>{expense.expenseuser}</p>
                                 <p>{expense.expenseamount} {data.currency}</p>
+
+                                    <div class="dropdown text-end">
+                                    <a href="#" class=" cursor-pointer d-flex link-body-emphasis text-decoration-none w-7" data-bs-toggle="dropdown" aria-expanded="false">
+                                    { expense.expenseuser == user.email &&  <img src={morevert} width="30px" alt="more" />}
+                                    </a>
+                                    <ul class="dropdown-menu text-small animate__animated animate__fadeIn bg-lightbg">
+                                        <li><a class="cursor-pointer dropdown-item" onClick={e => deleteExpense(expense)}>delete expense</a></li>
+                                    </ul>
+                                </div>
+
                             </div>
                             ))
                         }
