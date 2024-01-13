@@ -96,10 +96,9 @@
     }
     .signup_to{
         background-color: #FFF;
-        height: 500px;
+        height: 600px;
         display: flex;
         flex-direction: row;
-        flex-wrap: wrap;
         margin-bottom: 25px;
         .l_side{
             width: 50%;
@@ -196,6 +195,19 @@
         .btn_submit_google:hover,
         .btn_submit_google:focus {
         opacity: .75;
+        }
+    }
+}
+
+@media screen and (max-width: 570px){
+    .signup_to{
+        padding-top: 20px;
+        flex-direction: column!important;
+        .l_side{
+            width: 100%!important;
+        }
+        .r_side{
+            width: 100%!important;
         }
     }
 }

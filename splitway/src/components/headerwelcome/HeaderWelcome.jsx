@@ -1,5 +1,6 @@
 import styles from './Header.module.scss'
 import { Link } from 'react-router-dom'
+import logo from '../../assets/logos/logo.png'
 
 
 
@@ -8,7 +9,7 @@ const HeaderWelcome = () =>{
     return(
       <div className={styles.wrapper}>
         <a href="/">
-            <img src="" width="200px" alt="SplitWay" />
+            <img src={logo} width="180px" alt="SplitWay" />
         </a>
 
         <div className="flex">

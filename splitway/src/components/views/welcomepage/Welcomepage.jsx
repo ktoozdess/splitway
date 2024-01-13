@@ -8,6 +8,7 @@ import arrow_down from '../../../assets/arrow_circle_dropdown.svg'
 import screen from '../../../assets/screenshot.png'
 import googlelogo from '../../../assets/google_logo.svg'
 import { useNavigate } from "react-router-dom";
+import logoS from '../../../assets/logos/simple.png'
 
 const Welcomepage = () => {
   const [username, setUsername] = useState('')
@@ -107,7 +108,7 @@ const signInWithGoogle = () => {
 
 
   return (
-    <div>
+    <div  class="animate__animated animate__fadeIn">
       <HeaderWelcome />
       <div className={styles.main_wrapper}>
         <div className={styles.main_phrase}>
@@ -151,7 +152,7 @@ const signInWithGoogle = () => {
           <div className={styles.r_side}>
             <div className={styles.form}>
               <div class="flex flex-col justify-center items-center content-center mb-2">
-                <img src="" alt="S." />
+                <img src={logoS} alt="S." width="100px" />
                 <p>Welcome to Splitway</p>
               </div>
                 <input class="dark:bg-lightbg dark:placeholder-text-lighttheme dark:text-text-lighttheme" type="text" placeholder='Username' value={ username } onChange={(event) => setUsername(event.target.value)}  />
