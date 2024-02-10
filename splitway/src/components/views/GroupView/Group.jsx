@@ -213,7 +213,7 @@ const totalamount = () =>{
                 <div class="add_member_block hidden">
                     <div className={styles.add_member_block_handle} >
                         <div>
-                            <a onClick={closewindowhandle}><img src={close} alt="close" /></a>
+                            <a style={{cursor: 'pointer'}} onClick={closewindowhandle}><img src={close} alt="close" /></a>
                         </div>
                         <div className={styles.add_member_wrapper}>
                             <p>Add new member</p>
@@ -225,7 +225,7 @@ const totalamount = () =>{
                 <div class="add_expense_block hidden">
                     <div className={styles.add_expense_block_handle} >
                         <div>
-                            <a onClick={closewindowhandleexp}><img src={close} alt="close" /></a>
+                            <a style={{cursor: 'pointer'}} onClick={closewindowhandleexp}><img src={close} alt="close" /></a>
                         </div>
                         <div className={styles.add_expense_wrapper}>
                             <p>Add new expense</p>
@@ -243,7 +243,7 @@ const totalamount = () =>{
                 <div class="options_block hidden">
                     <div className={styles.options_block_handle} >
                         <div>
-                            <a onClick={closewindowhandleopt}><img src={close} alt="close" /></a>
+                            <a style={{cursor: 'pointer'}} onClick={closewindowhandleopt}><img src={close} alt="close" /></a>
                         </div>
                         <div className={styles.options_wrapper}>
                             <div class="flex flex-row flex-wrap w-12/12 items-center">
@@ -280,7 +280,7 @@ const totalamount = () =>{
                     <div className={styles.info_opt_etc}>
                         <a className={styles.btn_submit} onClick={addexpense}>Add an expense</a>
                         <p>Total amount: {totalamount()} {data.currency}</p>
-                        <a onClick={optionss}><img src={settings} alt="options" width="48px" /></a>
+                        <a style={{cursor: 'pointer'}} onClick={optionss}><img src={settings} alt="options" width="48px" /></a>
                     </div>
                     <div className={styles.expenses}>
                             {

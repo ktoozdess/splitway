@@ -9,6 +9,7 @@ import screen from '../../../assets/screenshot.png'
 import googlelogo from '../../../assets/google_logo.svg'
 import { useNavigate } from "react-router-dom";
 import logoS from '../../../assets/logos/simple.png'
+import close from '../../../assets/close.svg'
 
 const Welcomepage = () => {
   const [username, setUsername] = useState('')
@@ -105,11 +106,40 @@ const signInWithGoogle = () => {
       // console.log(error.message);
   })
 }
+const loginuser = () =>{
+  signInWithEmailAndPassword(auth, email, password1)
+  .then(() => {
 
+      console.log('success');
+      navigate('../', { replace: true })
+  })
+  .catch((error) => {
+  //   console.log(error);
+  });
+}
+const closesignin = () =>{
+  document.querySelector('.signin_wrapperr').classList.add('hidden')
+  }
 
   return (
     <div  class="animate__animated animate__fadeIn">
       <HeaderWelcome />
+      <div class="signin_wrapperr hidden">
+      <div className={styles.signin_wrapper}>
+      <div className={styles.form}>
+          <a class="cursor-pointer" onClick={closesignin}><img src={close} alt="X" /></a>
+              <div class="flex flex-col justify-center items-center content-center mb-2">
+                <img src={logoS} alt="S." width="100px" />
+                <p>Welcome to Splitway</p>
+              </div>
+                <input class="dark:bg-lightbg dark:placeholder-text-lighttheme dark:text-text-lighttheme" type="email" placeholder='Email' value={ email } onChange={(event) => setEmail(event.target.value)}  />
+                <input class="dark:bg-lightbg dark:placeholder-text-lighttheme dark:text-text-lighttheme" type="password" placeholder='Password' value={ password1 } onChange={(event) => setPassword1(event.target.value)} />
+                <a className={styles.btn_submit} onClick={loginuser}>Sign In</a>
+                <a className={styles.btn_submit_google} onClick={signInWithGoogle}> <img src={googlelogo} alt="" /> Sign In with Google</a>
+            </div>
+          </div>
+      </div>
+
       <div className={styles.main_wrapper}>
         <div className={styles.main_phrase}>
           <p>Main phrase</p>
@@ -117,7 +147,6 @@ const signInWithGoogle = () => {
         <div className={styles.main_phrase_arrow}>
           <img class="animate__animated animate__heartBeat animate__slower animate__infinite" src={arrow_down} alt="next" />
         </div>
-
         <div className={styles.first_intro}>
           <div className={styles.l_side}>
             <img src={screen} alt="" />
@@ -150,7 +179,7 @@ const signInWithGoogle = () => {
             <p>sign up to///</p>
           </div>
           <div className={styles.r_side}>
-            <div className={styles.form}>
+            <div id="Signup" className={styles.form}>
               <div class="flex flex-col justify-center items-center content-center mb-2">
                 <img src={logoS} alt="S." width="100px" />
                 <p>Welcome to Splitway</p>
@@ -166,6 +195,7 @@ const signInWithGoogle = () => {
         </div>
 
       </div>
+
     </div>
   )
 }

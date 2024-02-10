@@ -6,6 +6,9 @@ import logo from '../../assets/logos/logo.png'
 
 const HeaderWelcome = () =>{
 
+  const signinhide = () =>{
+    document.querySelector('.signin_wrapperr').classList.remove('hidden')
+    }
     return(
       <div className={styles.wrapper}>
         <a href="/">
@@ -13,12 +16,12 @@ const HeaderWelcome = () =>{
         </a>
 
         <div className="flex">
-          <Link class="mx-2 rounded-lg" to={'/signin'}>
+          <a class="mx-2 rounded-lg cursor-pointer" onClick={signinhide}>
              Log In
-           </Link>
-           <Link class="mx-2 rounded-lg" to={'/signup'}>
+           </a>
+           <a class="mx-2 rounded-lg" href='#Signup'>
              Sign Up
-           </Link>
+           </a>
         </div>
       </div>
     )

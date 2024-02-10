@@ -1,13 +1,13 @@
 import HeaderHome from "../../headerhome/HeaderHome"
 import styles from './homepage.module.scss'
-import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { collection, getDocs, updateDoc, doc, query } from 'firebase/firestore'
 import db from "../../../service/firebase.js"
 import addcircle from '../../../assets/add_circle.svg'
 import { Link } from "react-router-dom";
-
+import fiber from '../../../assets/fiber_manual.svg'
 
 const Home = () =>{
     const navigate = useNavigate()
@@ -25,10 +25,8 @@ const Home = () =>{
           });
         }
         FetchUser()
-
-
-
     }, [])
+
     useEffect(()=>{
       const FetchData = async() =>{
         const querySnapshot = await getDocs(query(collection(db, "groups")));
@@ -54,8 +52,8 @@ const Home = () =>{
           <p>{group.name}</p>
           {
             Object.values(group.members).map((member, index) =>(
-              <ul key={index} class="flex flex-col items-start content-start list-disc">
-                <li>{member.email}</li>
+              <ul key={index}>
+               <img src={fiber} alt="" /><li>{member.email}</li>
               </ul>
             ))
           }
