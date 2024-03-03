@@ -1,6 +1,6 @@
 import db from "../../../service/firebase.js"
 import { useEffect, useState } from 'react'
-import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup,updateProfile } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup,updateProfile } from "firebase/auth";
 import { setDoc, doc, getDocs, collection } from '@firebase/firestore';
 import HeaderWelcome from "../../headerwelcome/HeaderWelcome.jsx"
 import styles from './Welcomepage.module.scss'
@@ -109,9 +109,8 @@ const signInWithGoogle = () => {
 const loginuser = () =>{
   signInWithEmailAndPassword(auth, email, password1)
   .then(() => {
-
+      navigate('../homepage', { replace: true })
       console.log('success');
-      navigate('../', { replace: true })
   })
   .catch((error) => {
   //   console.log(error);
@@ -184,7 +183,7 @@ const closesignin = () =>{
                 <img src={logoS} alt="S." width="100px" />
                 <p>Welcome to Splitway</p>
               </div>
-                <input class="dark:bg-lightbg dark:placeholder-text-lighttheme dark:text-text-lighttheme" type="text" placeholder='Username' value={ username } onChange={(event) => setUsername(event.target.value)}  />
+                <input class="dark:bg-lightbg dark:placeholder-text-lighttheme dark:text-text-lighttheme" type="text" maxLength="14" placeholder='Username' value={ username } onChange={(event) => setUsername(event.target.value)}  />
                 <input class="dark:bg-lightbg dark:placeholder-text-lighttheme dark:text-text-lighttheme" type="email" placeholder='Email' value={ email } onChange={(event) => setEmail(event.target.value)}  />
                 <input class="dark:bg-lightbg dark:placeholder-text-lighttheme dark:text-text-lighttheme" type="password" placeholder='Password' value={ password1 } onChange={(event) => setPassword1(event.target.value)} />
                 <input class="dark:bg-lightbg dark:placeholder-text-lighttheme dark:text-text-lighttheme" type="password" placeholder='Password again' value={ password2 } onChange={(event) => setPassword2(event.target.value)} />

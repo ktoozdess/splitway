@@ -2,7 +2,7 @@ import styles from './Group.module.scss'
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { collection, getDocs, updateDoc, doc, query, arrayUnion, deleteField, setDoc, deleteDoc, arrayRemove  } from 'firebase/firestore'
+import { collection, getDocs, updateDoc, doc, query, arrayUnion, setDoc, deleteDoc, arrayRemove  } from 'firebase/firestore'
 import db from "../../../service/firebase.js"
 import { Link } from "react-router-dom";
 import HeaderHome from '../../headerhome/HeaderHome';
@@ -22,18 +22,43 @@ const Group = () => {
     const [ussers, setUssers] = useState([])
     const [members, setMembers] = useState([])
     const [expenses, setExpenses] = useState([])
-    const [expense, setExpense] = useState([])
     const [NewMember, SetNewMember] = useState('')
     const [expensetitle, Setexpensetitle] = useState('')
     const [expenseamount, Setexpenseamount] = useState()
-    const [expensesplitby, Setexpensesplitby] = useState('equally')
     const [Userswo, SetUserswo] = useState([])
     const [GroupName, SetGroupName] = useState('')
+    const [Switchmethod, SetSwitchmethod] = useState('equally')
+    const [successtrack, Setsuccesstrack] = useState(false)
+    const [benefitforme, Setbenefitforme] = useState(0)
 
     useEffect(() =>{
         let libusers = []
         let libuserswo = []
-        let libexpense = []
+        const FetchData = async() =>{
+            const querySnapshot = await getDocs(query(collection(db, "groups")));
+            querySnapshot.forEach((doc) => {
+                const data ={
+                    docId: doc.id,
+                    name: doc.data().name,
+                    admin: doc.data().admin,
+                    members: doc.data().members,
+                    expenses: doc.data().expenses,
+                    currency: doc.data().currency
+                }
+                if(doc.id == id){
+                  setData(data)
+                  setMembers(data.members)
+                  setExpenses(data.expenses)
+                }
+
+              SetUserswo(libuserswo)
+            })
+            Object.values(members).map((member) =>{
+              if(member.email !== auth.currentUser.email){
+                  libuserswo.push(member)
+                }
+          })
+        }
         const FetchUser = async() =>{
             const querySnapshot = await getDocs(collection(db, "users"));
             querySnapshot.forEach((doc) => {
@@ -42,52 +67,32 @@ const Group = () => {
             setUssers(libusers)
 
           }
-
-        const FetchData = async() =>{
-          const querySnapshot = await getDocs(query(collection(db, "groups")));
-          querySnapshot.forEach((doc) => {
-              const data ={
-                  docId: doc.id,
-                  name: doc.data().name,
-                  admin: doc.data().admin,
-                  members: doc.data().members,
-                  expenses: doc.data().expenses,
-                  currency: doc.data().currency
-              }
-              if(doc.id == id){
-                setData(data)
-                setMembers(data.members)
-                setExpenses(data.expenses)
-              }
-              Object.values(members).map((member) =>{
-                if(member.email !== auth.currentUser.email){
-                    libuserswo.push(member)
-                  }
-            })
-            SetUserswo(libuserswo)
-          });
-        }
         FetchUser()
         FetchData()
         totalamount()
-
-    }, [NewMember, expensetitle, GroupName, expenses])
-
+        Setsuccesstrack(false)
+        Setexpensetitle('')
+        SetGroupName('')
+        SetNewMember('')
+        Setexpenseamount(0)
+    }, [successtrack])
 
     const UpdateData = async() =>{
         const result = ussers.filter((user) => user.email == NewMember);
-        console.log(result);
-        if(result.length == 1){
+        const tested = members.filter((user) => user.email == NewMember);
+        if(result.length == 1 && tested.length == 0){
             await setDoc(doc(db, "groups", id), {
                 members: arrayUnion({'email' : NewMember})
             },{merge: true})
             .then(() =>{
-                SetNewMember('')
+                Setsuccesstrack(true)
                 document.querySelector('.add_member_block').classList.add('hidden')
-            })
-        }else{
+                });
+
+            }else{
             document.querySelector('.add_member_block').classList.add('hidden')
-            alert('User not found')
+            alert('User not found or you want add user which already in this group')
+            SetNewMember('')
         }
     }
 
@@ -100,8 +105,8 @@ const Group = () => {
     };
     const timestamp = event.toLocaleDateString('en-EN', options)
 
-var sum = 0;
-const totalamount = () =>{
+    var sum = 0;
+    const totalamount = () =>{
     expenses.forEach(function(expense) {
         sum += parseInt(expense.expenseamount);
     });
@@ -109,22 +114,33 @@ const totalamount = () =>{
 }
     const UpdateDataExpense = async() =>{
         const expenseuser = auth.currentUser.email
-        const expamountsbequall = expenseamount / members.length
-        if(expensetitle !== '' && expenseamount !== 0 && expensesplitby == 'equally'){
+        if(expensetitle !== '' && expenseamount !== 0 && Switchmethod == 'equally' && !(isNaN(expenseamount))){
+            const expamountsbequall = expenseamount / members.length
             let userowe = []
-            Object.values(Userswo).map(async(Userswoo) =>{
-                userowe.push({'email' : Userswoo.email, 'amount' : expamountsbequall})
+            Object.values(Userswo).map((Userswoo) =>{
+                userowe.push({'email' : Userswoo.email, 'amount' : expamountsbequall, 'to': expenseuser})
             })
-
             await updateDoc(doc(db, "groups", id), {
-                expenses: arrayUnion({expensetitle, expenseamount, timestamp, userlent: {}, userowes: userowe, expenseuser, splitby: 'equally'})
+                expenses: arrayUnion({expensetitle, expenseamount, timestamp, userlent: {}, userowes: userowe, expenseuser, Switchmethod: 'equally'})
             })
             .then(() =>{
-                Setexpensetitle('')
-                Setexpenseamount(0)
+                Setsuccesstrack(true)
                 document.querySelector('.add_expense_block').classList.add('hidden')
             })
-        }else{
+        }else if (Switchmethod == 'benefit'){
+            const expamountsbequall = (expenseamount - benefitforme) / (members.length - 1)
+            let userowe = []
+            Object.values(Userswo).map((Userswoo) =>{
+                userowe.push({'email' : Userswoo.email, 'amount' : expamountsbequall, 'to': expenseuser})
+            })
+            await updateDoc(doc(db, "groups", id), {
+                expenses: arrayUnion({expensetitle, expenseamount, timestamp, userlent: {}, userowes: userowe, expenseuser, Switchmethod: 'equally'})
+            })
+            .then(() =>{
+                Setsuccesstrack(true)
+                document.querySelector('.add_expense_block').classList.add('hidden')
+            })
+        } else{
             document.querySelector('.add_expense_block').classList.add('hidden')
             alert('User not found')
         }
@@ -139,6 +155,7 @@ const totalamount = () =>{
 
     const addexpense = () =>{
         document.querySelector('.add_expense_block').classList.remove('hidden')
+        Setsuccesstrack(true)
     }
     const optionss = () =>{
         document.querySelector('.options_block').classList.remove('hidden')
@@ -148,6 +165,16 @@ const totalamount = () =>{
     }
     const closewindowhandleopt = () =>{
         document.querySelector('.options_block').classList.add('hidden')
+    }
+    const openbenefitopt = () =>{
+        if (Switchmethod == 'benefit'){
+            return(
+                <div className={styles.benefit_opt_wrapper}>
+                    <div className={styles.benefit_opt}>Me <input class="form-control"  value={benefitforme} onChange={(event) => Setbenefitforme(event.target.value)}  type="text" /> / {expenseamount}</div>
+                    <div className={styles.benefit_opt}>Each <input disabled class="form-control"  value={(expenseamount - benefitforme) / (members.length - 1)}  type="text" /> / {expenseamount}</div>
+                </div>
+            )
+        }
     }
 
     const LeaveGroupHandle = () =>{
@@ -174,7 +201,8 @@ const totalamount = () =>{
                 await updateDoc(doc(db, "groups", id), {
                     expenses: arrayRemove(expense)
                     })
-            }
+                    Setsuccesstrack(true)
+                }
         })
     }
     const deleteGroup = () =>{
@@ -188,7 +216,7 @@ const totalamount = () =>{
                     name: GroupName
                 }).then(()=>{
                     closewindowhandleopt()
-                    SetGroupName('')
+                    Setsuccesstrack(true)
                 })
 
             }
@@ -206,6 +234,7 @@ const totalamount = () =>{
             )
         }
     }
+
     return(
         <div>
             <HeaderHome />
@@ -233,7 +262,16 @@ const totalamount = () =>{
                                 <div class="flex flex-col m-2">
                                     <input class="form-control m-1" type="email" placeholder='Title of expense' value={expensetitle} onChange={(event) => Setexpensetitle(event.target.value)} />
                                     <input class="form-control m-1" type="text" placeholder='Amount of expense'  value={expenseamount} onChange={(event) => Setexpenseamount(event.target.value)} />
-                                    <p>method: equally</p>
+                                    <select class="form-select"
+                                    onChange={event => SetSwitchmethod(event.target.value)}
+                                    defaultValue={SetSwitchmethod}
+                                    >
+                                        <option value="equally" selected>Select split method</option>
+                                        <option value="equally">Equally</option>
+                                        <option value="benefit">Benefit</option>
+                                        <option disabled value="3">Three</option>
+                                    </select>
+                                    {openbenefitopt()}
                                 </div>
                             </div>
                             <a className={styles.btn_submit} onClick={UpdateDataExpense} >Add expense</a>
@@ -267,14 +305,7 @@ const totalamount = () =>{
                         ))
                     }
                     <a className={styles.btn_submit} onClick={addmember} >Add member</a>
-
-                    {expenses.length !== 0 &&
-                    <div>
-                        <h3>Users who owe me</h3>
-                        <Expenses expenses={expenses} expense={expense} data={data} />
-                    </div>
-
-                    }
+                        <Expenses expenses={expenses} data={data} />
                 </div>
                 <div className={styles.right_bar}>
                     <div className={styles.info_opt_etc}>

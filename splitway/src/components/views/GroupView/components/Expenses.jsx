@@ -1,7 +1,12 @@
 import { useEffect ,useState } from "react"
+import { getAuth } from 'firebase/auth';
+import styles from '../Group.module.scss'
+
 
 const Expenses = ({expenses, data}) =>{
     const [expense, setExpense] = useState([])
+    const auth = getAuth();
+    let tempData = [];
     useEffect(() =>{
         let libexpense = []
         Object.values(expenses).map((expense) =>{
@@ -13,43 +18,46 @@ const Expenses = ({expenses, data}) =>{
         })
     },[data])
         const rendersumexpenses = () =>{
-            if( expenses.length > 1){
+
+            tempData = expense.filter((item)=>item.to == auth.currentUser.email)
+
+
                 let sumexpenses = [];
-                let sum = 0
-                let count = 0
-                for (let i = 0; i < expense.length; i++) {
-                        count+=1
-                    if(count < expenses.length){
-                        sum += expense[i].amount
-                    }else{
-                        sum += expense[i].amount
-                        sumexpenses.push({'email' : expense[i].email, 'amount' : sum})
-                        sum = 0
-                        count = 0
-                    }
+
+            let result  = tempData.reduce((prev, item) => {
+                if (item.email in prev){
+                    prev[item.email] += item.amount
+                }else{
+                    prev[item.email] = item.amount
                 }
+                return prev
+            }, {})
+
+            Object.keys(result).forEach(item => {
+
+                sumexpenses.push({'email' : item, 'amount' : result[item]})
+
+            });
+            if(tempData.length !== 0){
                 return(
-                    sumexpenses.map((exp, index) =>(
-                        // console.log(exp)
-                        <div key={index}>
-                        <p>{exp.email} {exp.amount} {data.currency}</p>
+                    <div className={styles.expense_wrapper}>
+                    <h3>Users who owe me:</h3>
+                    {
+                        sumexpenses.map((exp, index) =>(
+                            <div key={index}>
+                            <p>{exp.email} {Math.round(exp.amount * 10) / 10} {data.currency}</p>
+                        </div>
+                        ))
+                    }
                     </div>
-                    ))
-                )
-            }else{
-                return(
-                    expense.map((exp, index) =>(
-                        // console.log(exp)
-                        <div key={index}>
-                        <p>{exp.email} {exp.amount} {data.currency}</p>
-                    </div>
-                    ))
-                )
+                    )
             }
         }
 
     return(
         <>
+
+
             {rendersumexpenses()}
         </>
     )
