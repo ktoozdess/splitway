@@ -13,23 +13,14 @@ import { ProtectedRoute } from './components/ProtectedRoute.jsx';
 import FeedPage from './components/views/feed/feed.jsx';
 import Creategroup from './components/creategroup/CreateGroup.jsx';
 import Group from './components/views/GroupView/Group.jsx';
+import { AuthContext } from './context/AuthContext.jsx';
+import { UnProtectedRoute } from './components/UnProtectedRoute.jsx';
 
-
-const auth = getAuth();
-
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    console.log(user);
-  } else {
-    console.log('no');
-    console.log(user);
-  }
-});
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Welcomepage/>,
+    element: <UnProtectedRoute><Welcomepage/></UnProtectedRoute>,
   },
   {
     path: "/homepage",
@@ -51,5 +42,8 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <RouterProvider  router={router}/>
+  <AuthContext>
+    <RouterProvider  router={router}/>
+  </AuthContext>
+
 )
