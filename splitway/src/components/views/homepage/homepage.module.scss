@@ -4,6 +4,7 @@
     }
     .list_groups{
         display: flex;
+        flex-wrap: wrap;
         margin: 40px;
     }
     .list_item{

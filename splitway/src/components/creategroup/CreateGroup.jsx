@@ -6,12 +6,13 @@ import { addDoc, collection, arrayUnion } from '@firebase/firestore';
 import db from "../../service/firebase.js"
 import { getAuth } from 'firebase/auth';
 import React from 'react'
+import { useContext } from 'react';
+import { Context } from "../../context/AuthContext";
 
 
 const Creategroup = () =>{
     const navigate = useNavigate()
-    const auth = getAuth();
-    const user = auth.currentUser;
+    const {user} = useContext(Context)
     const [Groupname, setGroupname] = useState('')
     const [Switchcurrency, SetSwitchcurrency] = useState('USD')
 

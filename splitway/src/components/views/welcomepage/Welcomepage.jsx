@@ -10,6 +10,7 @@ import googlelogo from '../../../assets/google_logo.svg'
 import { useNavigate } from "react-router-dom";
 import logoS from '../../../assets/logos/simple.png'
 import close from '../../../assets/close.svg'
+import logo from '../../../assets/logos/logo.png'
 
 const Welcomepage = () => {
   const [username, setUsername] = useState('')
@@ -141,38 +142,22 @@ const closesignin = () =>{
 
       <div className={styles.main_wrapper}>
         <div className={styles.main_phrase}>
-          <p>Main phrase</p>
+          <p>Organize your group financial matters</p>
         </div>
         <div className={styles.main_phrase_arrow}>
           <img class="animate__animated animate__heartBeat animate__slower animate__infinite" src={arrow_down} alt="next" />
         </div>
         <div className={styles.first_intro}>
-          <div className={styles.l_side}>
-            <img src={screen} alt="" />
-          </div>
           <div className={styles.r_side}>
-            <p>some text</p>
+            <p>Enjoy time with friends without worrying about splitting payments</p>
           </div>
         </div>
 
         <div className={styles.sec_intro}>
         <div className={styles.r_side}>
-            <p>some text</p>
-          </div>
-          <div className={styles.l_side}>
-            <img src={screen} alt="" />
+            <p>Keeping track of your expenses on a regular basis is an important part of managing your overall finances. </p>
           </div>
         </div>
-
-        <div className={styles.third_intro}>
-          <div className={styles.l_side}>
-            <img src={screen} alt="" />
-          </div>
-          <div className={styles.r_side}>
-            <p>some text</p>
-          </div>
-        </div>
-
         <div className={styles.signup_to}>
           <div className={styles.l_side}>
             <p>sign up to///</p>

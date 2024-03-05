@@ -9,28 +9,27 @@ import HeaderHome from '../../headerhome/HeaderHome';
 import settings from '../../../assets/settings.svg'
 import morevert from '../../../assets/morevert.svg'
 import close from '../../../assets/close.svg'
-import { getAuth } from 'firebase/auth';
 import Expenses from './components/Expenses.jsx';
+import { useContext } from 'react';
+import { Context } from "../../../context/AuthContext";
 
 
 const Group = () => {
     const navigate = useNavigate()
     const {id} = useParams()
-    const auth = getAuth();
-    const user = auth.currentUser;
+    const {user} = useContext(Context)
     const [data, setData] = useState([])
     const [ussers, setUssers] = useState([])
     const [members, setMembers] = useState([])
     const [expenses, setExpenses] = useState([])
     const [NewMember, SetNewMember] = useState('')
     const [expensetitle, Setexpensetitle] = useState('')
-    const [expenseamount, Setexpenseamount] = useState()
+    const [expenseamount, Setexpenseamount] = useState(0)
     const [Userswo, SetUserswo] = useState([])
     const [GroupName, SetGroupName] = useState('')
     const [Switchmethod, SetSwitchmethod] = useState('equally')
     const [successtrack, Setsuccesstrack] = useState(false)
     const [benefitforme, Setbenefitforme] = useState(0)
-
     useEffect(() =>{
         let libusers = []
         let libuserswo = []
@@ -54,7 +53,7 @@ const Group = () => {
               SetUserswo(libuserswo)
             })
             Object.values(members).map((member) =>{
-              if(member.email !== auth.currentUser.email){
+              if(member.email !== user.email){
                   libuserswo.push(member)
                 }
           })
@@ -111,9 +110,13 @@ const Group = () => {
         sum += parseInt(expense.expenseamount);
     });
     return sum
-}
+    }
+    if(isNaN(expenseamount)){
+        alert('Amount must be a number')
+        Setexpenseamount(0)
+    }
     const UpdateDataExpense = async() =>{
-        const expenseuser = auth.currentUser.email
+        const expenseuser = user.email
         if(expensetitle !== '' && expenseamount !== 0 && Switchmethod == 'equally' && !(isNaN(expenseamount))){
             const expamountsbequall = expenseamount / members.length
             let userowe = []
@@ -142,7 +145,7 @@ const Group = () => {
             })
         } else{
             document.querySelector('.add_expense_block').classList.add('hidden')
-            alert('User not found')
+            alert('Error')
         }
 
     }
@@ -178,17 +181,17 @@ const Group = () => {
     }
 
     const LeaveGroupHandle = () =>{
-        const LeaveGroup = async() =>{
-            members.map(async(mem) =>{
-                if(mem.email == user.email){
-                    await updateDoc(doc(db, "groups", id), {
-                        members: arrayRemove({'email' : mem.email})
-                        })
-                }
-            })
+            const LeaveGroup = async() =>{
+                members.map(async(mem) =>{
+                    if(mem.email == user.email){
+                        await updateDoc(doc(db, "groups", id), {
+                            members: arrayRemove({'email' : mem.email})
+                            })
+                    }
+                })
 
-            navigate('../homepage', { replace: true })
-        }
+                navigate('../homepage', { replace: true })
+            }
         if(user && data.admin !== user.uid){
             return(
                 <a class="btn btn-danger" onClick={LeaveGroup}>Leave Group</a>
@@ -223,14 +226,14 @@ const Group = () => {
         }
         if(user && data.admin == user.uid){
             return(
-                <div class="flex flex-col justify-center">
-                    <div  className={styles.input_group}>
+                <div className={styles.input_block_handle}>
+                    <div  className={styles.input_group_wrapper}>
+                        <a class="cursor-pointer mb-2" onClick={closewindowhandleopt}><img src={close} alt="X" /></a>
                         <input class="form-control" type="text" placeholder='Change group name'  value={GroupName} onChange={(event) => SetGroupName(event.target.value)}/>
-                        <button onClick={updateGroupName} className="btn btn-secondary">Save</button>
+                        <button onClick={updateGroupName} className="btn btn-secondary mt-2">Save</button>
+                        <a class="btn btn-danger mt-2" onClick={deleteGroup}>Delete Group</a>
                     </div>
-                    <a class="btn btn-danger" onClick={deleteGroup}>Delete Group</a>
                 </div>
-
             )
         }
     }
@@ -238,25 +241,23 @@ const Group = () => {
     return(
         <div>
             <HeaderHome />
-            <div className={styles.main_wrapper}>
+            <div class="animate__animated animate__fadeIn" className={styles.main_wrapper}>
                 <div class="add_member_block hidden">
                     <div className={styles.add_member_block_handle} >
-                        <div>
-                            <a style={{cursor: 'pointer'}} onClick={closewindowhandle}><img src={close} alt="close" /></a>
-                        </div>
                         <div className={styles.add_member_wrapper}>
+                            <a class="cursor-pointer mb-2" onClick={closewindowhandle}><img src={close} alt="X" /></a>
                             <p>Add new member</p>
-                            <input type="email" value={NewMember} onChange={(event) => SetNewMember(event.target.value)} />
+                            <input type="email" placeholder='Enter member`s email' value={NewMember} onChange={(event) => SetNewMember(event.target.value)} />
+                            <div class="flex justify-center">
                             <a className={styles.btn_submit} onClick={UpdateData} >Add member</a>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="add_expense_block hidden">
                     <div className={styles.add_expense_block_handle} >
-                        <div>
-                            <a style={{cursor: 'pointer'}} onClick={closewindowhandleexp}><img src={close} alt="close" /></a>
-                        </div>
                         <div className={styles.add_expense_wrapper}>
+                        <a class="cursor-pointer mb-2" onClick={closewindowhandleexp}><img src={close} alt="X" /></a>
                             <p>Add new expense</p>
                             <div class="flex flex-row flex-wrap w-12/12 items-center">
                                 <div class="flex flex-col m-2">
@@ -274,22 +275,17 @@ const Group = () => {
                                     {openbenefitopt()}
                                 </div>
                             </div>
-                            <a className={styles.btn_submit} onClick={UpdateDataExpense} >Add expense</a>
+                            <div class="flex justify-center">
+                                <a className={styles.btn_submit} onClick={UpdateDataExpense} >Add expense</a>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="options_block hidden">
                     <div className={styles.options_block_handle} >
-                        <div>
-                            <a style={{cursor: 'pointer'}} onClick={closewindowhandleopt}><img src={close} alt="close" /></a>
-                        </div>
                         <div className={styles.options_wrapper}>
-                            <div class="flex flex-row flex-wrap w-12/12 items-center">
-                                <div class="flex flex-col m-2">
-                                    {LeaveGroupHandle()}
-                                    {deleteGroup()}
-                                </div>
-                            </div>
+                            {LeaveGroupHandle()}
+                            {deleteGroup()}
                         </div>
                     </div>
                 </div>

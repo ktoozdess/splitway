@@ -61,11 +61,11 @@ const Home = () =>{
       )
     })
     return(
-        <div>
+        <div class="animate__animated animate__fadeIn">
             <HeaderHome />
             <div className={styles.main_wrapper}>
                 <h3>My Groups</h3>
-                <div className={styles.list_groups}>
+                <div class="animate__animated animate__fadeIn" className={styles.list_groups}>
                     {mygroups}
                     <div className={styles.add_list_item}>
                       <Link to={'/creategroup'}><img src={addcircle} alt="add" /></Link>
