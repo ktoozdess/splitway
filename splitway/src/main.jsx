@@ -8,13 +8,13 @@ import Welcomepage from './components/views/welcomepage/Welcomepage.jsx'
 import Home from './components/views/homepage/homepage.jsx'
 import './index.css'
 import './assets/styles/global.css'
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { ProtectedRoute } from './components/ProtectedRoute.jsx';
 import FeedPage from './components/views/feed/feed.jsx';
 import Creategroup from './components/creategroup/CreateGroup.jsx';
 import Group from './components/views/GroupView/Group.jsx';
 import { AuthContext } from './context/AuthContext.jsx';
 import { UnProtectedRoute } from './components/UnProtectedRoute.jsx';
+import Expense from './components/views/ExpenseView/Expense.jsx';
 
 
 const router = createBrowserRouter([
@@ -37,6 +37,10 @@ const router = createBrowserRouter([
   {
     path: "/group/:id",
     element: <ProtectedRoute><Group/></ProtectedRoute>,
+  },
+  {
+    path: "/expense/:id",
+    element: <ProtectedRoute><Expense/></ProtectedRoute>,
   },
 
 ]);

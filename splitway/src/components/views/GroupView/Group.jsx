@@ -12,7 +12,7 @@ import close from '../../../assets/close.svg'
 import Expenses from './components/Expenses.jsx';
 import { useContext } from 'react';
 import { Context } from "../../../context/AuthContext";
-
+import { v4 as uuidv4 } from 'uuid';
 
 const Group = () => {
     const navigate = useNavigate()
@@ -117,36 +117,73 @@ const Group = () => {
     }
     const UpdateDataExpense = async() =>{
         const expenseuser = user.email
-        if(expensetitle !== '' && expenseamount !== 0 && Switchmethod == 'equally' && !(isNaN(expenseamount))){
+        const expenseId = uuidv4()
+
+        if(expensetitle == ''){
+            alert('Enter title')
+        }else if(expenseamount == 0){
+            alert('Enter amount')
+        }else if(Switchmethod == 'equally'){
             const expamountsbequall = expenseamount / members.length
             let userowe = []
             Object.values(Userswo).map((Userswoo) =>{
                 userowe.push({'email' : Userswoo.email, 'amount' : expamountsbequall, 'to': expenseuser})
             })
             await updateDoc(doc(db, "groups", id), {
-                expenses: arrayUnion({expensetitle, expenseamount, timestamp, userlent: {}, userowes: userowe, expenseuser, Switchmethod: 'equally'})
+                expenses: arrayUnion({docId: expenseId,expensetitle, expenseamount, timestamp, userlent: {}, userowes: userowe, expenseuser, Switchmethod: 'equally'})
             })
             .then(() =>{
                 Setsuccesstrack(true)
                 document.querySelector('.add_expense_block').classList.add('hidden')
             })
-        }else if (Switchmethod == 'benefit'){
+        }else if(Switchmethod == 'benefit'){
             const expamountsbequall = (expenseamount - benefitforme) / (members.length - 1)
-            let userowe = []
-            Object.values(Userswo).map((Userswoo) =>{
-                userowe.push({'email' : Userswoo.email, 'amount' : expamountsbequall, 'to': expenseuser})
-            })
-            await updateDoc(doc(db, "groups", id), {
-                expenses: arrayUnion({expensetitle, expenseamount, timestamp, userlent: {}, userowes: userowe, expenseuser, Switchmethod: 'equally'})
-            })
-            .then(() =>{
-                Setsuccesstrack(true)
-                document.querySelector('.add_expense_block').classList.add('hidden')
-            })
-        } else{
-            document.querySelector('.add_expense_block').classList.add('hidden')
-            alert('Error')
+                let userowe = []
+                Object.values(Userswo).map((Userswoo) =>{
+                    userowe.push({'email' : Userswoo.email, 'amount' : expamountsbequall, 'to': expenseuser})
+                })
+                await updateDoc(doc(db, "groups", id), {
+                    expenses: arrayUnion({docId: expenseId, expensetitle, expenseamount, timestamp, userlent: {}, userowes: userowe, expenseuser, Switchmethod: 'equally'})
+                })
+                .then(() =>{
+                    Setsuccesstrack(true)
+                    document.querySelector('.add_expense_block').classList.add('hidden')
+                })
+        }else{
+            alert('eerr')
         }
+
+
+        // if(expensetitle !== '' && expenseamount !== 0 && Switchmethod == 'equally' && !(isNaN(expenseamount))){
+        //     const expamountsbequall = expenseamount / members.length
+        //     let userowe = []
+        //     Object.values(Userswo).map((Userswoo) =>{
+        //         userowe.push({'email' : Userswoo.email, 'amount' : expamountsbequall, 'to': expenseuser})
+        //     })
+        //     await updateDoc(doc(db, "groups", id), {
+        //         expenses: arrayUnion({docId: expenseId,expensetitle, expenseamount, timestamp, userlent: {}, userowes: userowe, expenseuser, Switchmethod: 'equally'})
+        //     })
+        //     .then(() =>{
+        //         Setsuccesstrack(true)
+        //         document.querySelector('.add_expense_block').classList.add('hidden')
+        //     })
+        // }else if (Switchmethod == 'benefit'){
+        //     const expamountsbequall = (expenseamount - benefitforme) / (members.length - 1)
+        //     let userowe = []
+        //     Object.values(Userswo).map((Userswoo) =>{
+        //         userowe.push({'email' : Userswoo.email, 'amount' : expamountsbequall, 'to': expenseuser})
+        //     })
+        //     await updateDoc(doc(db, "groups", id), {
+        //         expenses: arrayUnion({docId: expenseId, expensetitle, expenseamount, timestamp, userlent: {}, userowes: userowe, expenseuser, Switchmethod: 'equally'})
+        //     })
+        //     .then(() =>{
+        //         Setsuccesstrack(true)
+        //         document.querySelector('.add_expense_block').classList.add('hidden')
+        //     })
+        // } else{
+        //     document.querySelector('.add_expense_block').classList.add('hidden')
+        //     alert('Error')
+        // }
 
     }
     const addmember = () =>{
@@ -270,7 +307,7 @@ const Group = () => {
                                         <option value="equally" selected>Select split method</option>
                                         <option value="equally">Equally</option>
                                         <option value="benefit">Benefit</option>
-                                        <option disabled value="3">Three</option>
+                                        <option disabled value="3">Coming soon...</option>
                                     </select>
                                     {openbenefitopt()}
                                 </div>
@@ -312,7 +349,7 @@ const Group = () => {
                     <div className={styles.expenses}>
                             {
                             expenses.map((expense, index) =>(
-                            <div className={styles.expense} key={index}>
+                                <Link to={`/expense/${expense.docId}`} className={styles.expense} key={index}>
                                 <p>{expense.timestamp}</p>
                                 <p>{expense.expensetitle}</p>
                                 <p>{expense.expenseuser}</p>
@@ -327,7 +364,7 @@ const Group = () => {
                                     </ul>
                                 </div>
 
-                            </div>
+                            </Link>
                             ))
                         }
                     </div>

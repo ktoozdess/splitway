@@ -160,7 +160,7 @@ const closesignin = () =>{
         </div>
         <div className={styles.signup_to}>
           <div className={styles.l_side}>
-            <p>sign up to///</p>
+            <p></p>
           </div>
           <div className={styles.r_side}>
             <div id="Signup" className={styles.form}>

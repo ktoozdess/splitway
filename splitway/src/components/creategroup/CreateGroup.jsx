@@ -34,7 +34,7 @@ const Creategroup = () =>{
     return(
         <div class="animate__animated animate__fadeIn">
         <div className={styles.wrapper}>
-            <Link class="dark:text-text-darktheme" className={styles.back_home_link} to={'/homepage'}> Back to home</Link>
+            <Link className={styles.back_home_link} to={'/homepage'}> Back to home</Link>
         <div className={styles.form}>
             <p>Create Group</p>
             <input type="text" maxLength="14" value={Groupname} onChange={(event) => setGroupname(event.target.value)} placeholder='Group name' />
