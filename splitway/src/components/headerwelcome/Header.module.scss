@@ -4,7 +4,7 @@
     align-items: center;
     justify-content: space-around;
     align-content: center;
-    padding: 18px 0px;
+    padding: 20px 0px;
     position: fixed;
     z-index: 1;
     width: 100%;
@@ -12,25 +12,17 @@
     a{
         display: flex;
         flex-direction: row;
-        margin-bottom: 0.5rem;
         align-items: center;
-        h3{
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 30px;
-        }
     }
 }
-.nav_link{
-    padding: 0px 8px;
-}
-.addcircle_logo{
-    margin: 0px 4px;
-}
-.profile_logo{
-    margin: 0px 4px;
-    img{
-        border-radius: 90px;
-        width: 52px;
-        height: 52px;
+
+@media screen and (max-width: 450px){
+    .wrapper{
+        padding: 20px 0px;
+        a{
+            img{
+                width: 140px;
+            }
+        }
     }
 }
